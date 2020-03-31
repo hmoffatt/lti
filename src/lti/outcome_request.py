@@ -64,7 +64,7 @@ class OutcomeRequest(object):
         request.process_xml(post_request.body)
         return request
 
-    def post_replace_result(self, score, result_data=None):
+    def post_replace_result(self, score, result_data=None, headers={}):
         '''
         POSTs the given score to the Tool Consumer with a replaceResult.
 
@@ -89,23 +89,23 @@ class OutcomeRequest(object):
                              '"text" or the key "url".')
                 raise InvalidLTIConfigError(error_msg)
             else:
-                return self.post_outcome_request()
+                return self.post_outcome_request(headers)
         else:
-            return self.post_outcome_request()
+            return self.post_outcome_request(headers)
 
-    def post_delete_result(self):
+    def post_delete_result(self, headers={}):
         '''
         POSTs a deleteRequest to the Tool Consumer.
         '''
         self.operation = DELETE_REQUEST
-        return self.post_outcome_request()
+        return self.post_outcome_request(headers)
 
-    def post_read_result(self):
+    def post_read_result(self, headers={}):
         '''
         POSTS a readResult to the Tool Consumer.
         '''
         self.operation = READ_REQUEST
-        return self.post_outcome_request()
+        return self.post_outcome_request(headers)
 
     def is_replace_request(self):
         '''
@@ -128,7 +128,7 @@ class OutcomeRequest(object):
     def was_outcome_post_successful(self):
         return self.outcome_response and self.outcome_response.is_success()
 
-    def post_outcome_request(self, **kwargs):
+    def post_outcome_request(self, headers={}, **kwargs):
         '''
         POST an OAuth signed request to the Tool Consumer.
         '''
@@ -140,7 +140,7 @@ class OutcomeRequest(object):
                               signature_type=SIGNATURE_TYPE_AUTH_HEADER,
                               force_include_body=True, **kwargs)
 
-        headers = {'Content-type': 'application/xml'}
+        headers.update({'Content-type': 'application/xml'})
         resp = requests.post(self.lis_outcome_service_url, auth=header_oauth,
                              data=self.generate_request_xml(),
                              headers=headers)
