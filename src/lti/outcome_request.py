@@ -4,6 +4,7 @@ from lxml import etree, objectify
 import requests
 from requests_oauthlib import OAuth1
 from requests_oauthlib.oauth1_auth import SIGNATURE_TYPE_AUTH_HEADER
+from requests.structures import CaseInsensitiveDict
 
 from .outcome_response import OutcomeResponse
 from .utils import InvalidLTIConfigError
@@ -51,8 +52,9 @@ class OutcomeRequest(object):
                     "Invalid outcome request option: {}".format(key)
                 )
 
-        self.headers = headers or {}
-        self.headers.update({'Content-type': 'application/xml'})
+        self.headers = CaseInsensitiveDict(headers)
+        if "Content-Type" not in self.headers:
+            self.headers['Content-type'] = 'application/xml'
 
     @staticmethod
     def from_post_request(post_request, headers=None):
