@@ -52,7 +52,7 @@ class OutcomeRequest(object):
                     "Invalid outcome request option: {}".format(key)
                 )
 
-        self.headers = CaseInsensitiveDict(headers)
+        self.headers = CaseInsensitiveDict(headers or {})
         if "Content-Type" not in self.headers:
             self.headers['Content-type'] = 'application/xml'
 
